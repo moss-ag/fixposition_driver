@@ -195,7 +195,12 @@ void OdometryConverter::ConvertTokens(const std::vector<std::string>& tokens) {
         msgs_.eul = gnss_tf::EcefPoseToEnuEul(t_ecef_body, q_ecef_body.toRotationMatrix());
 
         // Odmetry msg ENU0 - FP_POI
-        msgs_.odometry_enu0.stamp = stamp;
+        
+        if (use_ros_timestamp_) {
+            msgs_.odometry_enu0.stamp = rclcpp::Time::now();
+        } else {
+            msgs_.odometry_enu0.stamp = stamp;
+        }
         msgs_.odometry_enu0.frame_id = "FP_ENU0";
         msgs_.odometry_enu0.child_frame_id = "FP_POI";
         // Pose
