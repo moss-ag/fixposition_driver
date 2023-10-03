@@ -45,11 +45,16 @@ include_directories(
 )
 
 add_executable(
+  global_tf_publisher_node
+  src/global_tf_publisher_node.cpp
+  src/global_tf_publisher.cpp
+)
+
+add_executable(
   ${PROJECT_NAME}_exec
   src/fixposition_driver_node.cpp
   src/params.cpp
   src/data_to_ros2.cpp
-  src/global_tf_publisher.cpp
 )
 
 if($ENV{ROS_DISTRO} MATCHES "humble|rolling")
@@ -67,6 +72,13 @@ else()
 endif()
 
 target_link_libraries(
+  global_tf_publisher_node
+  ${fixposition_gnss_tf_LIBRARIES}
+  ${fixposition_driver_lib_LIBRARIES}
+  ${cpp_typesupport_target}
+)
+
+target_link_libraries(
   ${PROJECT_NAME}_exec
   ${fixposition_gnss_tf_LIBRARIES}
   ${fixposition_driver_lib_LIBRARIES}
@@ -80,7 +92,7 @@ install(DIRECTORY include/
   DESTINATION .
 )
 
-install(TARGETS ${PROJECT_NAME}_exec
+install(TARGETS ${PROJECT_NAME}_exec global_tf_publisher_node
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -91,6 +103,8 @@ install(DIRECTORY
   "launch"
   DESTINATION share/${PROJECT_NAME}/
 )
+
+ament_target_dependencies(global_tf_publisher_node rclcpp std_msgs nav_msgs geometry_msgs sensor_msgs tf2_ros tf2_eigen tf2_geometry_msgs fixposition_gnss_tf fixposition_driver_lib)
 ament_target_dependencies(${PROJECT_NAME}_exec rclcpp std_msgs nav_msgs geometry_msgs sensor_msgs tf2_ros tf2_eigen tf2_geometry_msgs fixposition_gnss_tf fixposition_driver_lib)
 
 # define ament package for this project

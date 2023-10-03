@@ -32,7 +32,6 @@
 #include <fixposition_driver_ros2/data_to_ros2.hpp>
 #include <fixposition_driver_ros2/fixposition_driver_node.hpp>
 #include <fixposition_driver_ros2/params.hpp>
-#include <fixposition_driver_ros2/global_tf_publisher.hpp>
 
 namespace fixposition {
 
@@ -215,17 +214,12 @@ void FixpositionDriverNode::BestGnssPosToPublishNavSatFix(const Oem7MessageHeade
 int main(int argc, char** argv) {
     rclcpp::init(argc, argv);
     std::shared_ptr<rclcpp::Node> node = rclcpp::Node::make_shared("fixposition_driver");
-    std::shared_ptr<rclcpp::Node> tf_node = rclcpp::Node::make_shared("global_tf_publisher");
     fixposition::FixpositionDriverParams params;
 
     RCLCPP_INFO(node->get_logger(), "Starting node...");
 
     if (fixposition::LoadParamsFromRos2(node, params)) {
         RCLCPP_INFO(node->get_logger(), "Params Loaded!");
-        std::thread([&tf_node]() {
-            fixposition::GlobalTFPublisher tf_publisher(tf_node);
-            rclcpp::spin(tf_node);
-        }).detach();
         fixposition::FixpositionDriverNode driver_node(node, params);
         driver_node.Run();
         RCLCPP_INFO(node->get_logger(), "Exiting.");
