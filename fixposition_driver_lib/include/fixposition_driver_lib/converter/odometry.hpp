@@ -44,6 +44,7 @@ class OdometryConverter : public BaseAsciiConverter {
         TfData tf_ecef_poi;
         TfData tf_ecef_enu;
         TfData tf_ecef_enu0;
+        NavSatFixData llh_enu0_origin;
     };
 
     using OdometryObserver = std::function<void(const Msgs&)>;
@@ -89,7 +90,6 @@ class OdometryConverter : public BaseAsciiConverter {
     bool tf_ecef_enu0_set_;  //!< flag to indicate if the tf is already set
     Eigen::Vector3d t_ecef_enu0_;
     Eigen::Quaterniond q_ecef_enu0_;
-    bool use_ros_timestamp_ = true;
 
     Msgs msgs_;
     std::vector<OdometryObserver> obs_;

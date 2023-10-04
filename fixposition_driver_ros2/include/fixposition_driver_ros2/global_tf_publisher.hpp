@@ -30,6 +30,7 @@ private:
     rclcpp::Subscription<fixposition_driver_ros2::msg::VRTK>::SharedPtr vrtk_sub_;
 
     std::atomic<bool> fusion_running_ = {false};
+    double tf_delay_ = 0.2;
 };
 
 } // namespace fixposition

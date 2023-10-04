@@ -58,7 +58,7 @@ void GlobalTFPublisher::OdomENU0Callback(const nav_msgs::msg::Odometry::SharedPt
 
   geometry_msgs::msg::TransformStamped map_odom_trans_msg;
   map_odom_trans_msg.transform = tf2::toMsg(map_odom_trans);
-  map_odom_trans_msg.header.stamp = static_cast<rclcpp::Time>(msg->header.stamp);
+  map_odom_trans_msg.header.stamp = static_cast<rclcpp::Time>(msg->header.stamp) + rclcpp::Duration::from_seconds(tf_delay_);
   map_odom_trans_msg.header.frame_id = "local_enu";
   map_odom_trans_msg.child_frame_id = "odom";
 

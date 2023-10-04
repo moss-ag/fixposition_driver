@@ -43,6 +43,7 @@ FixpositionDriverNode::FixpositionDriverNode(std::shared_ptr<rclcpp::Node> node,
       navsatfix_pub_(node_->create_publisher<sensor_msgs::msg::NavSatFix>("/fixposition/navsatfix", 100)),
       navsatfix_gnss1_pub_(node_->create_publisher<sensor_msgs::msg::NavSatFix>("/fixposition/gnss1", 100)),
       navsatfix_gnss2_pub_(node_->create_publisher<sensor_msgs::msg::NavSatFix>("/fixposition/gnss2", 100)),
+      navsatfix_enu0_pub_(node_->create_publisher<sensor_msgs::msg::NavSatFix>("/fixposition/navsatfix/origin", 100)),
       odometry_pub_(node_->create_publisher<nav_msgs::msg::Odometry>("/fixposition/odometry", 100)),
       poiimu_pub_(node_->create_publisher<sensor_msgs::msg::Imu>("/fixposition/poiimu", 100)),
       vrtk_pub_(node_->create_publisher<fixposition_driver_ros2::msg::VRTK>("/fixposition/vrtk", 100)),
@@ -98,9 +99,18 @@ void FixpositionDriverNode::RegisterObservers() {
                         odometry_pub_->publish(odometry);
                     }
 
+                    if (navsatfix_enu0_pub_->get_subscription_count() > 0) {
+                        sensor_msgs::msg::NavSatFix msg;
+                        NavSatFixDataToMsg(data.llh_enu0_origin, msg);
+                        msg.header.stamp = node_->now();
+                        msg.header.frame_id = "local_enu";
+                        navsatfix_enu0_pub_->publish(msg);
+                    }
+
                     if (odometry_enu0_pub_->get_subscription_count() > 0) {
                         nav_msgs::msg::Odometry odometry_enu0;
                         OdometryDataToMsg(data.odometry_enu0, odometry_enu0);
+                        odometry_enu0.header.stamp = node_->now();
                         odometry_enu0_pub_->publish(odometry_enu0);
                     }
 

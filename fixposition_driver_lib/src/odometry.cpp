@@ -138,6 +138,12 @@ void OdometryConverter::ConvertTokens(const std::vector<std::string>& tokens) {
             msgs_.tf_ecef_enu0.translation = t_ecef_enu0_;
             msgs_.tf_ecef_enu0.rotation = q_ecef_enu0_;
             tf_ecef_enu0_set_ = true;
+
+            // Send ENU0 in LLH
+            auto enu0_llh = gnss_tf::TfWgs84LlhEcef(t_ecef_enu0_);
+            msgs_.llh_enu0_origin.latitude = enu0_llh[0] * 180.0 / M_PI;
+            msgs_.llh_enu0_origin.longitude = enu0_llh[1] * 180.0 / M_PI;
+            msgs_.llh_enu0_origin.altitude = enu0_llh[2];
         }
 
         // TF ECEF POI is basically the same as the odometry, containing the Pose of the POI in the ECEF Frame
@@ -196,11 +202,7 @@ void OdometryConverter::ConvertTokens(const std::vector<std::string>& tokens) {
 
         // Odmetry msg ENU0 - FP_POI
         
-        if (use_ros_timestamp_) {
-            msgs_.odometry_enu0.stamp = rclcpp::Time::now();
-        } else {
-            msgs_.odometry_enu0.stamp = stamp;
-        }
+        msgs_.odometry_enu0.stamp = stamp;
         msgs_.odometry_enu0.frame_id = "FP_ENU0";
         msgs_.odometry_enu0.child_frame_id = "FP_POI";
         // Pose
